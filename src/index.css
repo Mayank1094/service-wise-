@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  --color-primary-text: #111827; /* Dark black/gray for main text */
+  --color-secondary-text: #6B7280; /* Soft gray for secondary text */
+  --color-bg-base: #FFFFFF;
+  --color-bg-subtle: #F9FAFB; /* Very light gray */
+  --color-border-subtle: #E5E7EB;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-base text-primary-text font-sans antialiased;
+  }
+}
