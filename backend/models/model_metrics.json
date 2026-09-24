@@ -1,0 +1,19 @@
+{
+  "model_name": "RandomForestRegressor_v1",
+  "r2_score": 0.9449,
+  "r2_percentage": "94.49%",
+  "mae_inr": 1125.77,
+  "rmse_inr": 1917.78,
+  "training_samples": 16000,
+  "test_samples": 4000,
+  "features": [
+    "vehicle_type",
+    "service_type",
+    "vehicle_age",
+    "kilometers_driven",
+    "fuel_type",
+    "engine_type",
+    "previous_services"
+  ],
+  "trained_at": "2026-09-24 07:34:08"
+}

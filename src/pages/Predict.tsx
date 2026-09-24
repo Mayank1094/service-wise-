@@ -2,8 +2,91 @@ import { useState } from 'react';
 import { Loader2, Info } from 'lucide-react';
 import { predictServiceCost, type PredictionRequest, type PredictionResponse } from '../services/api';
 
+interface VehicleConstraint {
+  label: string;
+  allowedFuels: { value: string; label: string }[];
+  allowedTransmissions: { value: string; label: string }[];
+  defaultFuel: string;
+  defaultTransmission: string;
+}
+
+const VEHICLE_CONFIGS: Record<string, VehicleConstraint> = {
+  Car: {
+    label: 'Car',
+    allowedFuels: [
+      { value: 'Petrol', label: 'Petrol' },
+      { value: 'Diesel', label: 'Diesel' },
+      { value: 'EV', label: 'Electric (EV)' },
+      { value: 'Hybrid', label: 'Hybrid' },
+    ],
+    allowedTransmissions: [
+      { value: 'Manual', label: 'Manual' },
+      { value: 'Automatic', label: 'Automatic' },
+    ],
+    defaultFuel: 'Petrol',
+    defaultTransmission: 'Manual',
+  },
+  SUV: {
+    label: 'SUV',
+    allowedFuels: [
+      { value: 'Petrol', label: 'Petrol' },
+      { value: 'Diesel', label: 'Diesel' },
+      { value: 'EV', label: 'Electric (EV)' },
+      { value: 'Hybrid', label: 'Hybrid' },
+    ],
+    allowedTransmissions: [
+      { value: 'Manual', label: 'Manual' },
+      { value: 'Automatic', label: 'Automatic' },
+    ],
+    defaultFuel: 'Diesel',
+    defaultTransmission: 'Manual',
+  },
+  Bike: {
+    label: 'Bike',
+    allowedFuels: [{ value: 'Petrol', label: 'Petrol' }],
+    allowedTransmissions: [
+      { value: 'Manual', label: 'Manual (Geared)' },
+      { value: 'Automatic', label: 'Clutchless / Semi-Auto' },
+    ],
+    defaultFuel: 'Petrol',
+    defaultTransmission: 'Manual',
+  },
+  Scooty: {
+    label: 'Scooty',
+    allowedFuels: [{ value: 'Petrol', label: 'Petrol' }],
+    allowedTransmissions: [{ value: 'Automatic', label: 'Automatic (CVT / Gearless)' }],
+    defaultFuel: 'Petrol',
+    defaultTransmission: 'Automatic',
+  },
+  'Electric Bike': {
+    label: 'Electric Bike',
+    allowedFuels: [{ value: 'EV', label: 'Electric (EV)' }],
+    allowedTransmissions: [{ value: 'Automatic', label: 'Automatic (Direct Drive)' }],
+    defaultFuel: 'EV',
+    defaultTransmission: 'Automatic',
+  },
+  'Electric Scooter': {
+    label: 'Electric Scooter',
+    allowedFuels: [{ value: 'EV', label: 'Electric (EV)' }],
+    allowedTransmissions: [{ value: 'Automatic', label: 'Automatic (Direct Drive)' }],
+    defaultFuel: 'EV',
+    defaultTransmission: 'Automatic',
+  },
+};
+
+interface FormState {
+  vehicle_type: string;
+  vehicle_age: number | string;
+  kilometers_driven: number | string;
+  fuel_type: string;
+  engine_type: string;
+  service_type: string;
+  previous_service_cost: number;
+  previous_services: number;
+}
+
 export default function Predict() {
-  const [formData, setFormData] = useState<PredictionRequest>({
+  const [formData, setFormData] = useState<FormState>({
     vehicle_type: 'Car',
     vehicle_age: 3,
     kilometers_driven: 25000,
@@ -17,11 +100,32 @@ export default function Predict() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PredictionResponse | null>(null);
 
+  const currentVehicleConfig = VEHICLE_CONFIGS[formData.vehicle_type] || VEHICLE_CONFIGS['Car'];
+
+  const handleVehicleTypeChange = (newVehicle: string) => {
+    const config = VEHICLE_CONFIGS[newVehicle] || VEHICLE_CONFIGS['Car'];
+    setFormData(prev => {
+      const isFuelValid = config.allowedFuels.some(f => f.value === prev.fuel_type);
+      const isTransValid = config.allowedTransmissions.some(t => t.value === prev.engine_type);
+      return {
+        ...prev,
+        vehicle_type: newVehicle,
+        fuel_type: isFuelValid ? prev.fuel_type : config.defaultFuel,
+        engine_type: isTransValid ? prev.engine_type : config.defaultTransmission,
+      };
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name === 'vehicle_type') {
+      handleVehicleTypeChange(value);
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: e.target.type === 'number' ? Number(value) : value
+      [name]: value === '' ? '' : (e.target.type === 'number' ? (isNaN(Number(value)) ? value : Number(value)) : value)
     }));
   };
 
@@ -30,7 +134,12 @@ export default function Predict() {
     setLoading(true);
     setResult(null);
     try {
-      const response = await predictServiceCost(formData);
+      const payload: PredictionRequest = {
+        ...formData,
+        vehicle_age: Number(formData.vehicle_age) || 0,
+        kilometers_driven: Number(formData.kilometers_driven) || 0,
+      };
+      const response = await predictServiceCost(payload);
       setResult(response);
     } catch (error) {
       console.error("Prediction failed", error);
@@ -64,11 +173,14 @@ export default function Predict() {
                     name="vehicle_type" 
                     value={formData.vehicle_type} 
                     onChange={handleChange}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none"
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none font-medium text-gray-800"
                   >
+                    <option value="Bike">Bike</option>
+                    <option value="Scooty">Scooty</option>
                     <option value="Car">Car</option>
                     <option value="SUV">SUV</option>
-                    <option value="Bike">Bike</option>
+                    <option value="Electric Bike">Electric Bike</option>
+                    <option value="Electric Scooter">Electric Scooter</option>
                   </select>
                 </div>
 
@@ -79,7 +191,7 @@ export default function Predict() {
                     name="service_type" 
                     value={formData.service_type} 
                     onChange={handleChange}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none"
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none font-medium text-gray-800"
                   >
                     <option value="General">General Maintenance</option>
                     <option value="Major">Major Service</option>
@@ -94,9 +206,10 @@ export default function Predict() {
                     type="number" 
                     name="vehicle_age"
                     min="0"
+                    placeholder="e.g. 4"
                     value={formData.vehicle_age} 
                     onChange={handleChange}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none"
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none font-medium text-gray-800"
                   />
                 </div>
 
@@ -107,40 +220,69 @@ export default function Predict() {
                     type="number" 
                     name="kilometers_driven"
                     min="0"
-                    step="100"
+                    step="500"
+                    placeholder="e.g. 35000"
                     value={formData.kilometers_driven} 
                     onChange={handleChange}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none"
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none font-medium text-gray-800"
                   />
                 </div>
 
                 {/* Fuel Type */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-primary-text">Fuel Type</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-primary-text">Fuel Type</label>
+                    {currentVehicleConfig.allowedFuels.length === 1 && (
+                      <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium">
+                        Auto-locked for {formData.vehicle_type}
+                      </span>
+                    )}
+                  </div>
                   <select 
                     name="fuel_type" 
                     value={formData.fuel_type} 
                     onChange={handleChange}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none"
+                    disabled={currentVehicleConfig.allowedFuels.length === 1}
+                    className={`w-full h-12 px-4 rounded-xl border border-gray-200 transition-all outline-none font-medium text-gray-800 ${
+                      currentVehicleConfig.allowedFuels.length === 1 
+                        ? 'bg-gray-100 cursor-not-allowed text-gray-600' 
+                        : 'bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent'
+                    }`}
                   >
-                    <option value="Petrol">Petrol</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="EV">Electric (EV)</option>
-                    <option value="Hybrid">Hybrid</option>
+                    {currentVehicleConfig.allowedFuels.map(fuel => (
+                      <option key={fuel.value} value={fuel.value}>
+                        {fuel.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 {/* Engine Type */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-primary-text">Transmission / Engine</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-primary-text">Transmission / Engine</label>
+                    {currentVehicleConfig.allowedTransmissions.length === 1 && (
+                      <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium">
+                        Auto-locked
+                      </span>
+                    )}
+                  </div>
                   <select 
                     name="engine_type" 
                     value={formData.engine_type} 
                     onChange={handleChange}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent transition-all outline-none"
+                    disabled={currentVehicleConfig.allowedTransmissions.length === 1}
+                    className={`w-full h-12 px-4 rounded-xl border border-gray-200 transition-all outline-none font-medium text-gray-800 ${
+                      currentVehicleConfig.allowedTransmissions.length === 1 
+                        ? 'bg-gray-100 cursor-not-allowed text-gray-600' 
+                        : 'bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#111827] focus:border-transparent'
+                    }`}
                   >
-                    <option value="Manual">Manual</option>
-                    <option value="Automatic">Automatic</option>
+                    {currentVehicleConfig.allowedTransmissions.map(trans => (
+                      <option key={trans.value} value={trans.value}>
+                        {trans.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
