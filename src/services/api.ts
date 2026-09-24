@@ -15,7 +15,7 @@ export interface PredictionResponse {
   accuracy_estimate: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://servicewise-api.onrender.com';
 
 /**
  * Sends vehicle prediction request to the live Python FastAPI ML backend.
