@@ -1,19 +1,29 @@
 {
-  "model_name": "RandomForestRegressor_v1",
-  "r2_score": 0.9449,
-  "r2_percentage": "94.49%",
-  "mae_inr": 1125.77,
-  "rmse_inr": 1917.78,
-  "training_samples": 16000,
-  "test_samples": 4000,
+  "model_name": "LightGBM_Regressor_v2",
+  "r2_score": 0.9931,
+  "r2_percentage": "99.31%",
+  "mape_percentage": "4.95%",
+  "mae_inr": 841.77,
+  "rmse_inr": 1856.09,
+  "training_samples": 80000,
+  "test_samples": 20000,
   "features": [
     "vehicle_type",
-    "service_type",
-    "vehicle_age",
-    "kilometers_driven",
+    "brand_segment",
     "fuel_type",
     "engine_type",
-    "previous_services"
+    "service_type",
+    "workshop_type",
+    "city_tier",
+    "service_history",
+    "vehicle_age",
+    "kilometers_driven",
+    "addon_brake_pads",
+    "addon_ac_service",
+    "addon_battery",
+    "addon_wheel_care",
+    "addon_clutch",
+    "addon_suspension"
   ],
-  "trained_at": "2026-09-24 07:34:08"
+  "trained_at": "2026-09-26 17:53:27"
 }
