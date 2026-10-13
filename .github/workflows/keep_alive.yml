@@ -1,0 +1,23 @@
+name: Keep Render Backend Awake
+
+on:
+  schedule:
+    # Runs every 10 minutes (Render sleeps after 15 minutes)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping ServiceWise API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend Health Endpoint
+        run: |
+          echo "Sending keep-alive ping to Render backend..."
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://servicewise-api.onrender.com/health)
+          echo "Response HTTP Status Code: $STATUS_CODE"
+          if [ "$STATUS_CODE" -eq 200 ]; then
+            echo "✅ Backend is awake and healthy!"
+          else
+            echo "⚠️ Backend responded with code $STATUS_CODE (it may be waking up)"
+          fi
