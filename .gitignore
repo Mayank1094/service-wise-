@@ -29,3 +29,7 @@ venv/
 *.pyc
 __pycache__/
 *.joblib
+
+# Project Synopsis & Reports (Local only)
+synopsis/
+*.pdf
