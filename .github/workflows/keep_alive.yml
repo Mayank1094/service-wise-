@@ -1,23 +1,35 @@
 name: Keep Render Backend Awake
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'
-  workflow_dispatch:
+schedule:
+- cron: '*/10 * * * *'
+workflow_dispatch:
 
 jobs:
-  ping:
-    name: Ping ServiceWise API
-    runs-on: ubuntu-latest
-    steps:
-      - name: Ping Render Backend Health Endpoint
-        run: |
-          echo "Pinging ServiceWise backend..."
-          STATUS_CODE=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" https://servicewise-api.onrender.com/health)
-          echo "HTTP Status: $STATUS_CODE"
-          if [ "$STATUS_CODE" -eq 200 ]; then
-            echo "Backend is healthy!"
-          else
-            echo "Backend health check failed!"
-            exit 1
-          fi
+ping:
+name: Ping ServiceWise API
+runs-on: ubuntu-latest
+steps:
+- name: Ping Render Backend Health Endpoint
+run: |
+echo "Pinging ServiceWise backend..."
+
+      for attempt in 1 2 3; do
+        STATUS_CODE=$(curl --connect-timeout 15 --max-time 60 -sS -o /dev/null -w "%{http_code}" https://servicewise-api.onrender.com/health || true)
+
+        echo "Attempt $attempt: HTTP $STATUS_CODE"
+
+        if [ "$STATUS_CODE" = "200" ]; then
+          echo "Backend is awake and healthy!"
+          exit 0
+        fi
+
+        echo "Backend did not return HTTP 200."
+
+        if [ "$attempt" -lt 3 ]; then
+          sleep 10
+        fi
+      done
+
+      echo "Backend did not become healthy after 3 attempts."
+      exit 1
