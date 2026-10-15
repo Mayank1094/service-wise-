@@ -18,29 +18,39 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="py-24 bg-bg-base">
-      <div className="container mx-auto px-6 text-center">
+    <section id="how-it-works" className="py-16 sm:py-20 bg-white">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 text-center">
         
-        <div className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold tracking-widest text-secondary-text uppercase mb-4">
-          How It Works
+        {/* Eyebrow */}
+        <div className="text-[12px] sm:text-[13px] tracking-[0.2em] font-semibold text-[#6B7480] uppercase mb-2">
+          HOW IT WORKS
         </div>
         
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-primary-text mb-16 relative inline-block">
+        {/* Main Heading */}
+        <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-[#101318]">
           Simple. Fast. Useful.
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-12 h-1 bg-[#111827] rounded-full"></div>
         </h2>
+        {/* Short Line Divider */}
+        <div className="w-12 h-1 bg-[#101318] rounded-full mx-auto mt-3.5 mb-12 sm:mb-14"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        {/* 3 Process Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7 text-left">
           {steps.map((step, i) => (
             <div 
               key={i} 
-              className="group flex flex-col items-start p-8 rounded-3xl bg-bg-subtle border border-border-subtle/50 transition-all hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1"
+              className="flex items-center gap-4 sm:gap-5 p-6 sm:p-7 rounded-2xl bg-white border border-[#E6E8ED] hover:border-gray-300 transition-all shadow-xs"
             >
-              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-primary-text mb-6 group-hover:bg-[#111827] group-hover:text-white transition-colors">
+              <div className="w-12 h-12 rounded-full bg-[#EAECEF] text-[#101318] flex items-center justify-center text-lg font-bold shrink-0">
                 {step.num}
               </div>
-              <h3 className="text-xl font-semibold text-primary-text mb-2 text-left">{step.title}</h3>
-              <p className="text-secondary-text text-left">{step.desc}</p>
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-[17px] font-bold text-[#101318] leading-snug">
+                  {step.title}
+                </h3>
+                <p className="text-[13px] sm:text-[14px] text-[#68717D] mt-0.5 leading-snug">
+                  {step.desc}
+                </p>
+              </div>
             </div>
           ))}
         </div>

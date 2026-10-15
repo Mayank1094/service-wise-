@@ -15,39 +15,44 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border-subtle bg-bg-base/80 backdrop-blur-md">
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        {/* Logo */}
+    <header className="sticky top-0 z-50 w-full border-b border-[#E6E8ED]/80 bg-white/90 backdrop-blur-md">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 h-[76px] flex items-center justify-between">
+        {/* Logo (Left) */}
         <Link 
           to="/" 
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-2.5 group"
         >
-          <Car className="w-7 h-7 text-primary-text transition-transform group-hover:-translate-y-0.5 duration-300" />
-          <span className="font-bold text-xl tracking-tight text-primary-text">ServiceWise</span>
+          <Car className="w-7 h-7 text-[#101318] stroke-[2] transition-transform group-hover:-translate-y-0.5 duration-200" />
+          <span className="font-bold text-[23px] tracking-tight text-[#101318]">ServiceWise</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={twMerge(
-                "text-sm font-medium transition-colors hover:text-primary-text",
-                location.pathname === link.path ? "text-primary-text font-semibold" : "text-secondary-text"
-              )}
-            >
-              {link.name}
-            </Link>
-          ))}
+        {/* Desktop Navigation (Center) */}
+        <nav className="hidden md:flex items-center gap-9">
+          {navLinks.map((link) => {
+            const isActive = location.pathname === link.path;
+            return (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={twMerge(
+                  "text-[15px] transition-colors duration-150",
+                  isActive 
+                    ? "text-[#101318] font-semibold" 
+                    : "text-[#66707C] font-normal hover:text-[#101318]"
+                )}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* CTA Button & Mobile Menu Toggle */}
+        {/* CTA Button (Right) */}
         <div className="flex items-center gap-3">
           <Link
             to="/predict"
-            className="hidden md:inline-flex h-10 items-center justify-center rounded-full bg-[#111827] px-6 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+            className="hidden md:inline-flex h-[42px] items-center justify-center rounded-full bg-[#111820] px-6 text-[14px] font-semibold text-white transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] shadow-xs"
           >
             Get Started
           </Link>

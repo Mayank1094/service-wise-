@@ -3,78 +3,84 @@ import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-bg-base pt-16 md:pt-24 lg:pt-32 pb-16">
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+    <section className="relative overflow-hidden bg-white pt-8 sm:pt-10 lg:pt-12 pb-10 lg:pb-14">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 relative z-10">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           
-          {/* Left Text Content */}
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-xs font-semibold tracking-widest text-secondary-text mb-6">
+          {/* Left Text Content (Column 1-6) */}
+          <div className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center">
+            {/* Eyebrow */}
+            <div className="text-[12px] sm:text-[13px] tracking-[0.2em] uppercase font-medium text-[#66707C] mb-4">
               SMARTER SERVICE. A SMOOTHER JOURNEY.
             </div>
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-primary-text leading-[1.1] mb-6">
-              Vehicle Service<br />Cost Prediction
+            {/* Main Heading */}
+            <h1 className="text-4xl sm:text-5xl lg:text-[64px] xl:text-[72px] font-extrabold tracking-[-0.035em] text-[#101318] leading-[1.04] mb-5">
+              Vehicle Service<br className="hidden sm:inline" /> Cost Prediction
             </h1>
             
-            <p className="text-lg md:text-xl text-secondary-text mb-8 max-w-lg leading-relaxed">
-              Know your estimated service cost before you visit the garage.<br/>
+            {/* Description */}
+            <p className="text-base sm:text-lg lg:text-[20px] text-[#66707C] leading-[1.45] font-normal mb-8 max-w-xl">
+              Know your estimated service cost before you visit the garage.<br className="hidden sm:inline" />
               Powered by Machine Learning.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-16">
+            {/* Buttons */}
+            <div className="flex flex-row items-center gap-4 mb-9">
               <Link
                 to="/predict"
-                className="inline-flex h-14 items-center justify-center rounded-full bg-[#111827] px-8 text-base font-medium text-white transition-all hover:bg-gray-800 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-gray-900/20"
+                className="inline-flex h-[58px] sm:h-[62px] items-center justify-center rounded-full bg-[#111820] hover:bg-black px-8 sm:px-9 text-base font-semibold text-white transition-all hover:scale-[1.01] active:scale-[0.99] group shadow-sm"
               >
                 Predict Now
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-2.5 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link
-                to="/about"
-                className="inline-flex h-14 items-center justify-center rounded-full bg-gray-100 px-8 text-base font-medium text-primary-text transition-all hover:bg-gray-200"
+              <a
+                href="#how-it-works"
+                className="inline-flex h-[58px] sm:h-[62px] items-center justify-center rounded-full bg-[#E9EBF0] hover:bg-[#E2E5EB] px-8 sm:px-9 text-base font-semibold text-[#111820] transition-all"
               >
                 Learn More
-              </Link>
+              </a>
             </div>
 
-            {/* Stats Bar */}
-            <div className="flex items-center gap-8 md:gap-12 pt-8 border-t border-border-subtle/60">
+            {/* Trust Indicators */}
+            <div className="flex items-center gap-6 sm:gap-8 pt-1">
               <div>
-                <h3 className="text-lg font-bold text-primary-text">Accurate</h3>
-                <p className="text-sm text-secondary-text">ML Powered</p>
+                <div className="text-[16px] font-bold text-[#101318] leading-tight">Accurate</div>
+                <div className="text-[13px] text-[#66707C] mt-0.5">ML Powered</div>
               </div>
-              <div className="w-px h-10 bg-border-subtle/60 hidden sm:block"></div>
+              <div className="w-px h-8 bg-[#E6E8ED]"></div>
               <div>
-                <h3 className="text-lg font-bold text-primary-text">Fast</h3>
-                <p className="text-sm text-secondary-text">Get results in seconds</p>
+                <div className="text-[16px] font-bold text-[#101318] leading-tight">Fast</div>
+                <div className="text-[13px] text-[#66707C] mt-0.5">Get results in seconds</div>
               </div>
-              <div className="w-px h-10 bg-border-subtle/60 hidden sm:block"></div>
+              <div className="w-px h-8 bg-[#E6E8ED]"></div>
               <div>
-                <h3 className="text-lg font-bold text-primary-text">Reliable</h3>
-                <p className="text-sm text-secondary-text">Built for every vehicle</p>
+                <div className="text-[16px] font-bold text-[#101318] leading-tight">Reliable</div>
+                <div className="text-[13px] text-[#66707C] mt-0.5">Built for every vehicle</div>
               </div>
             </div>
           </div>
 
-          {/* Right Image/Car Content */}
-          <div className="relative w-full h-[400px] lg:h-[600px] flex items-center justify-center">
-            {/* Background shape mimicking the reference */}
-            <div className="absolute top-0 right-0 w-[150%] h-[150%] bg-gradient-to-bl from-gray-100 to-transparent rounded-[100%] translate-x-1/4 -translate-y-1/4 -z-10"></div>
-            
-            {/* Decorative Quote */}
-            <div className="absolute top-10 right-10 text-right opacity-60 hidden md:block">
-              <p className="italic font-serif text-lg">"Plan smarter.<br/>Drive longer."</p>
-              <div className="w-8 h-px bg-current ml-auto mt-2"></div>
+          {/* Right Image/Car Content (Column 7-12) */}
+          <div className="lg:col-span-6 xl:col-span-6 relative flex flex-col justify-center">
+            {/* Decorative Quote in top-right */}
+            <div className="text-right mb-2 pr-3 hidden lg:block">
+              <p className="text-[15px] sm:text-[16px] text-[#66707C] font-normal leading-snug">
+                &ldquo;Plan smarter.<br />Drive longer.&rdquo;
+              </p>
+              <div className="w-8 h-[1.5px] bg-[#D1D5DB] ml-auto mt-2"></div>
             </div>
 
-            {/* Car Image */}
-            <div className="relative w-full max-w-2xl mx-auto flex justify-center items-center">
+            {/* Vehicle Image Container */}
+            <div className="relative w-full rounded-2xl overflow-hidden">
               <img 
-                src="/car.png" 
-                alt="Premium modern car" 
-                className="w-full h-auto object-contain scale-110 mix-blend-multiply"
-                style={{ WebkitMaskImage: 'radial-gradient(circle, black 60%, transparent 100%)' }}
+                src="/hero-car.jpg" 
+                alt="Premium silver luxury sedan" 
+                className="w-full h-auto object-cover rounded-2xl select-none"
+                style={{
+                  maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 100%)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 100%)'
+                }}
               />
             </div>
           </div>
