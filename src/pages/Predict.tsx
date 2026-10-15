@@ -148,6 +148,7 @@ export default function Predict() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PredictionResponse | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const currentVehicleConfig = VEHICLE_CONFIGS[formData.vehicle_type] || VEHICLE_CONFIGS['Car'];
   const is2W = ['Bike', 'Scooty', 'Electric Bike', 'Electric Scooter'].includes(formData.vehicle_type);
@@ -191,15 +192,17 @@ export default function Predict() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
     try {
       const response = await predictServiceCost({
         ...formData,
-        vehicle_age: Number(formData.vehicle_age) || 0,
-        kilometers_driven: Number(formData.kilometers_driven) || 0,
+        vehicle_age: Math.max(0, Math.min(40, Number(formData.vehicle_age) || 0)),
+        kilometers_driven: Math.max(0, Math.min(1000000, Number(formData.kilometers_driven) || 0)),
       });
       setResult(response);
     } catch (error) {
       console.error("Prediction failed", error);
+      setErrorMessage("Unable to calculate service cost. Please verify vehicle parameters and try again.");
     } finally {
       setLoading(false);
     }
@@ -643,6 +646,22 @@ export default function Predict() {
           <div className="lg:col-span-5">
             <div className="sticky top-28 space-y-5">
               
+              {errorMessage && (
+                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start justify-between gap-3 shadow-xs">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <span>{errorMessage}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setErrorMessage(null)}
+                    className="text-rose-500 hover:text-rose-800 font-bold text-sm cursor-pointer"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
               {!result && !loading && (
                 <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center shadow-xs flex flex-col items-center justify-center min-h-[420px]">
                   <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4 text-gray-400">

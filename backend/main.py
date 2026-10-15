@@ -1,4 +1,5 @@
 import os
+import logging
 import joblib
 import pandas as pd
 from typing import List, Optional
@@ -21,7 +22,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "*"
     ],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -45,17 +46,17 @@ print("✓ LightGBM Model loaded and ready for predictions!")
 class PredictionRequest(BaseModel):
     vehicle_type: str = Field(..., description="Vehicle type: Car, SUV, Bike, Scooty, Electric Bike, Electric Scooter")
     brand_segment: str = Field(default="mid", description="Segment tier: budget, mid, premium, luxury")
-    vehicle_age: float = Field(..., ge=0, description="Age in years")
-    kilometers_driven: float = Field(..., ge=0, description="Total kilometers driven")
+    vehicle_age: float = Field(..., ge=0, le=40, description="Age in years (0 to 40)")
+    kilometers_driven: float = Field(..., ge=0, le=1000000, description="Total kilometers driven (0 to 1,000,000)")
     fuel_type: str = Field(default="Petrol", description="Fuel type: Petrol, Diesel, EV, Hybrid")
     engine_type: str = Field(default="Manual", description="Transmission: Manual, Automatic")
     service_type: str = Field(default="General", description="Service type: General, Major, Repair")
     workshop_type: str = Field(default="multibrand", description="authorized_oem, multibrand, local_independent")
     city_tier: str = Field(default="tier1_metro", description="tier1_metro, tier2, tier3")
     service_history: str = Field(default="regular", description="regular, overdue, first_service")
-    selected_addons: List[str] = Field(default_factory=list, description="Selected addon IDs")
-    previous_services: Optional[int] = Field(None, description="Count of past services")
-    previous_service_cost: Optional[float] = Field(None, description="Previous bill amount")
+    selected_addons: List[str] = Field(default_factory=list, max_length=15, description="Selected addon IDs")
+    previous_services: Optional[int] = Field(None, ge=0, le=100, description="Count of past services")
+    previous_service_cost: Optional[float] = Field(None, ge=0, le=500000, description="Previous bill amount")
 
 class CostBreakdown(BaseModel):
     parts_cost: int
@@ -180,7 +181,11 @@ def predict(request: PredictionRequest):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+        logging.error(f"Prediction failed with exception: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail="Prediction processing failed. Please verify vehicle parameters and try again."
+        )
 
 if __name__ == "__main__":
     import uvicorn

@@ -110,9 +110,11 @@ function calculateClientEstimate(data: PredictionRequest): PredictionResponse {
   }
 
   // 4. Vehicle Age and Mileage Aging Factor
-  const ageFactor = 1 + Math.min(0.45, (data.vehicle_age * (is2W ? 0.025 : 0.03)));
+  const safeAge = Math.max(0, Math.min(40, Number(data.vehicle_age) || 0));
+  const safeKm = Math.max(0, Math.min(1000000, Number(data.kilometers_driven) || 0));
+  const ageFactor = 1 + Math.min(0.45, (safeAge * (is2W ? 0.025 : 0.03)));
   const kmLimit = is2W ? 80000 : 180000;
-  const kmFactor = 1 + Math.min(0.35, (data.kilometers_driven / kmLimit) * 0.25);
+  const kmFactor = 1 + Math.min(0.35, (safeKm / kmLimit) * 0.25);
   
   let partsTotal = baseParts * ageFactor * kmFactor;
   let laborTotal = baseLabor * ageFactor * kmFactor;

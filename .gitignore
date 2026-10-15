@@ -29,6 +29,7 @@ venv/
 *.pyc
 __pycache__/
 *.joblib
+!backend/models/service_cost_model.joblib
 
 # Project Synopsis & Reports (Local only)
 synopsis/
