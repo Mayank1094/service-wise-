@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Car, 
   Bike, 
@@ -16,6 +16,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { predictServiceCost, type PredictionRequest, type PredictionResponse } from '../services/api';
+import { subscribeBackendStatus, warmUpBackend, type BackendStatus } from '../services/warmup';
 
 interface VehicleConstraint {
   label: string;
@@ -149,6 +150,14 @@ export default function Predict() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PredictionResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [backendStatus, setBackendStatus] = useState<BackendStatus>('idle');
+
+  useEffect(() => {
+    // Ping backend on mount if not already warmed up
+    warmUpBackend();
+    const unsubscribe = subscribeBackendStatus(setBackendStatus);
+    return unsubscribe;
+  }, []);
 
   const currentVehicleConfig = VEHICLE_CONFIGS[formData.vehicle_type] || VEHICLE_CONFIGS['Car'];
   const is2W = ['Bike', 'Scooty', 'Electric Bike', 'Electric Scooter'].includes(formData.vehicle_type);
@@ -214,9 +223,34 @@ export default function Predict() {
         
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-3 border border-emerald-200/60">
-            <Sparkles className="w-3.5 h-3.5" />
-            Precise Multi-Factor Cost Engine
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/60">
+              <Sparkles className="w-3.5 h-3.5" />
+              Precise Multi-Factor Cost Engine
+            </div>
+
+            {backendStatus === 'warming' && (
+              <div 
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-medium border border-amber-200/70"
+                title="Cloud ML server is waking up from sleep. Instant local engine is active in the meantime."
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                Waking Cloud ML Server... (Instant Engine Active)
+              </div>
+            )}
+
+            {backendStatus === 'ready' && (
+              <div 
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200/70"
+                title="FastAPI LightGBM Cloud ML Engine is online and ready"
+              >
+                <span className="inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                Cloud ML Server Active
+              </div>
+            )}
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-3">
             Estimate Real-World Service Cost

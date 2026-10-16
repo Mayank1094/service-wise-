@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Car, Menu, X } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
+import { warmUpBackend } from '../../services/warmup';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,6 +36,9 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 to={link.path}
+                onMouseEnter={() => {
+                  if (link.path === '/predict') warmUpBackend();
+                }}
                 className={twMerge(
                   "text-[15px] transition-colors duration-150",
                   isActive 
@@ -52,6 +56,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             to="/predict"
+            onMouseEnter={() => warmUpBackend()}
             className="hidden md:inline-flex h-[42px] items-center justify-center rounded-full bg-[#111820] px-6 text-[14px] font-semibold text-white transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] shadow-xs"
           >
             Get Started

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { warmUpBackend } from '../../services/warmup';
 
 export default function Hero() {
   return (
@@ -29,6 +30,7 @@ export default function Hero() {
             <div className="flex flex-row items-center gap-4 mb-9">
               <Link
                 to="/predict"
+                onMouseEnter={() => warmUpBackend()}
                 className="inline-flex h-[58px] sm:h-[62px] items-center justify-center rounded-full bg-[#111820] hover:bg-black px-8 sm:px-9 text-base font-semibold text-white transition-all hover:scale-[1.01] active:scale-[0.99] group shadow-sm"
               >
                 Predict Now
