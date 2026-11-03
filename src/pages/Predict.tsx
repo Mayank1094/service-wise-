@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { predictServiceCost, type PredictionRequest, type PredictionResponse } from '../services/api';
 import { subscribeBackendStatus, warmUpBackend, type BackendStatus } from '../services/warmup';
+import { useAuth } from '../context/AuthContext';
+import { savePredictionHistory } from '../services/history';
 
 interface VehicleConstraint {
   label: string;
@@ -133,6 +135,7 @@ const COMMON_ADDONS = [
 ];
 
 export default function Predict() {
+  const { user } = useAuth();
   const [formData, setFormData] = useState<PredictionRequest>({
     vehicle_type: 'Car',
     brand_segment: 'mid',
@@ -203,12 +206,20 @@ export default function Predict() {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const response = await predictServiceCost({
+      const sanitizedPayload = {
         ...formData,
         vehicle_age: Math.max(0, Math.min(40, Number(formData.vehicle_age) || 0)),
         kilometers_driven: Math.max(0, Math.min(1000000, Number(formData.kilometers_driven) || 0)),
-      });
+      };
+      const response = await predictServiceCost(sanitizedPayload);
       setResult(response);
+
+      // Auto-save to user calculation history if logged in
+      if (user) {
+        savePredictionHistory(user.uid, sanitizedPayload, response).catch((err) =>
+          console.error("Failed to auto-save history:", err)
+        );
+      }
     } catch (error) {
       console.error("Prediction failed", error);
       setErrorMessage("Unable to calculate service cost. Please verify vehicle parameters and try again.");

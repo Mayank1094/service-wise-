@@ -6,6 +6,10 @@ import Home from './pages/Home';
 import Predict from './pages/Predict';
 import About from './pages/About';
 import Features from './pages/Features';
+import Login from './pages/Login';
+import HistoryPage from './pages/History';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import { warmUpBackend } from './services/warmup';
 
 function App() {
@@ -13,21 +17,40 @@ function App() {
     // Non-blocking warmup ping to wake Render backend on initial visit
     warmUpBackend();
   }, []);
+
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/predict" element={<Predict />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/features" element={<Features />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          <Navbar />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route
+                path="/predict"
+                element={
+                  <ProtectedRoute>
+                    <Predict />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/history"
+                element={
+                  <ProtectedRoute>
+                    <HistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/features" element={<Features />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

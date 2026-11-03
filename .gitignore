@@ -34,3 +34,7 @@ __pycache__/
 # Project Synopsis & Reports (Local only)
 synopsis/
 *.pdf
+
+# Environment variables
+.env
+.env*.local
